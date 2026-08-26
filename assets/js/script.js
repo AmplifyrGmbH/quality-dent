@@ -1,0 +1,217 @@
+(function () {
+  'use strict';
+
+  /* Header: transparent over the hero, solid frosted bar once scrolled past it.
+     The logo is taller in the on-hero state, so the header's real rendered
+     height differs between states — --header-h (used for the hero's
+     negative margin-top) must be resynced on every state change, not just
+     once on load, or a sliver of page background shows above the header. */
+  var siteHeader = document.getElementById('site-header');
+  var hero = document.getElementById('hero');
+  var syncHeaderHeight = function () {
+    if (siteHeader) document.documentElement.style.setProperty('--header-h', siteHeader.offsetHeight + 'px');
+  };
+  if (siteHeader && hero && 'IntersectionObserver' in window) {
+    siteHeader.classList.add('is-on-hero');
+    syncHeaderHeight();
+    var heroObserver = new IntersectionObserver(function (entries) {
+      siteHeader.classList.toggle('is-on-hero', entries[0].isIntersecting);
+      syncHeaderHeight();
+      window.setTimeout(syncHeaderHeight, 320); // after the height transition settles
+    }, { rootMargin: '-' + siteHeader.offsetHeight + 'px 0px 0px 0px', threshold: 0 });
+    heroObserver.observe(hero);
+  } else if (siteHeader && !hero) {
+    siteHeader.classList.remove('is-on-hero');
+    syncHeaderHeight();
+  } else {
+    syncHeaderHeight();
+  }
+  window.addEventListener('resize', syncHeaderHeight);
+
+  /* Hero: slow crossfade between the hero photos */
+  var heroSlides = document.querySelectorAll('.hero__slide');
+  if (heroSlides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var heroIndex = 0;
+    window.setInterval(function () {
+      heroSlides[heroIndex].classList.remove('is-active');
+      heroIndex = (heroIndex + 1) % heroSlides.length;
+      heroSlides[heroIndex].classList.add('is-active');
+    }, 6500);
+  }
+
+  /* Mobile nav toggle */
+  var navToggle = document.getElementById('nav-toggle');
+  var siteNav = document.getElementById('site-nav');
+  function closeNav() {
+    if (!navToggle || !siteNav) return;
+    siteNav.classList.remove('is-open');
+    navToggle.setAttribute('aria-expanded', 'false');
+    if (siteHeader) siteHeader.classList.remove('nav-is-open');
+    navToggle.setAttribute('aria-label', 'Menü öffnen');
+  }
+  function openNav() {
+    siteNav.classList.add('is-open');
+    navToggle.setAttribute('aria-expanded', 'true');
+    if (siteHeader) siteHeader.classList.add('nav-is-open');
+    navToggle.setAttribute('aria-label', 'Menü schliessen');
+  }
+  if (navToggle && siteNav) {
+    navToggle.addEventListener('click', function () {
+      var isOpen = navToggle.getAttribute('aria-expanded') === 'true';
+      if (isOpen) { closeNav(); } else { openNav(); }
+    });
+    siteNav.querySelectorAll('a').forEach(function (link) { link.addEventListener('click', closeNav); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeNav(); });
+  }
+
+  /* Leistungen: render service grid from real Quality Dent photos */
+  var services = [
+    { n: '01', img: 'assets/img/svc-kronen.jpg', title: 'ZirkonOxid – Kronen & Brücken', text: 'Hochfeste Zirkonoxid-Gerüste, individuell verblendet.' },
+    { n: '02', img: 'assets/img/svc-keramik-new.jpg', title: 'Vollkeramische Restaurationen', text: 'Inlays, Onlays und Veneers — minimalinvasiv und ästhetisch.' },
+    { n: '03', img: 'assets/img/svc-metall.jpg', title: 'Metallkeramik', text: 'Stabiles Metallgerüst mit keramischer Verblendung.' },
+    { n: '04', img: 'assets/img/svc-implantat-new.jpg', title: 'Implantatprothetik', text: 'Passgenauer Zahnersatz auf Implantaten.' },
+    { n: '05', img: 'assets/img/svc-prothesen.jpg', title: 'Teil-, Hybrid- & Totalprothesen', text: 'Abnehmbarer Zahnersatz mit Fokus auf Tragekomfort.' },
+    { n: '06', img: 'assets/img/svc-modellguss.jpg', title: 'Modellguss-Prothesen', text: 'Filigrane Metallgerüste für stabilen, dezenten Zahnersatz.' },
+    { n: '07', img: 'assets/img/svc-schienen-new.jpg', title: 'Schienen aller Arten', text: 'Aufbiss-, Knirscher- und Sportschienen nach Mass.' },
+    { n: '08', img: 'assets/img/svc-valplast.jpg', title: 'Valplast', text: 'Flexibler, nahezu unsichtbarer Prothesenkunststoff.' }
+  ];
+  var viewport = document.getElementById('showcaseViewport');
+  if (viewport) {
+    var dotsWrap = document.getElementById('showcaseDots');
+    var slides = [];
+    services.forEach(function (s, i) {
+      var slide = document.createElement('div');
+      slide.className = 'showcase__slide';
+      slide.innerHTML =
+        '<img src="' + s.img + '" alt="' + s.title + ' – Quality Dent AG" loading="' + (i < 2 ? 'eager' : 'lazy') + '">' +
+        '<div class="showcase__caption"><span class="showcase__no">' + s.n + ' / 08</span>' +
+        '<h3 class="showcase__title">' + s.title + '</h3><p class="showcase__text">' + s.text + '</p></div>';
+      viewport.appendChild(slide);
+      slides.push(slide);
+
+      var dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'showcase__dot';
+      dot.setAttribute('aria-label', 'Zu „' + s.title + '“ springen');
+      dot.addEventListener('click', function () { goToSlide(i); userInteracted(); });
+      dotsWrap.appendChild(dot);
+    });
+    var dots = Array.prototype.slice.call(dotsWrap.children);
+    var current = 0;
+
+    function setActive(i) {
+      current = i;
+      slides.forEach(function (s, j) { s.classList.toggle('is-active', j === i); });
+      dots.forEach(function (d, j) { d.classList.toggle('is-active', j === i); });
+    }
+    function goToSlide(i) {
+      var idx = (i + slides.length) % slides.length;
+      var slide = slides[idx];
+      // Manual centering instead of scrollIntoView: with CSS scroll-snap
+      // active on the viewport, a smooth scrollIntoView animation can get
+      // cut short by the browser's own snap resolution, landing off-center.
+      var target = slide.offsetLeft - (viewport.clientWidth - slide.offsetWidth) / 2;
+      viewport.scrollTo({ left: target, behavior: 'smooth' });
+      setActive(idx);
+    }
+    setActive(0);
+
+    if ('IntersectionObserver' in window) {
+      var slideObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
+            setActive(slides.indexOf(entry.target));
+          }
+        });
+      }, { root: viewport, threshold: [0.6] });
+      slides.forEach(function (s) { slideObserver.observe(s); });
+    }
+
+    document.getElementById('showcasePrev').addEventListener('click', function () { goToSlide(current - 1); userInteracted(); });
+    document.getElementById('showcaseNext').addEventListener('click', function () { goToSlide(current + 1); userInteracted(); });
+
+    var autoplayTimer = null;
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function startAutoplay() {
+      if (reduceMotion) return;
+      stopAutoplay();
+      autoplayTimer = window.setInterval(function () { goToSlide(current + 1); }, 4800);
+    }
+    function stopAutoplay() { if (autoplayTimer) { window.clearInterval(autoplayTimer); autoplayTimer = null; } }
+    function userInteracted() { stopAutoplay(); window.setTimeout(startAutoplay, 9000); }
+
+    viewport.addEventListener('pointerdown', userInteracted);
+    viewport.addEventListener('mouseenter', stopAutoplay);
+    viewport.addEventListener('mouseleave', startAutoplay);
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) startAutoplay(); else stopAutoplay();
+      }, { threshold: 0.2 }).observe(viewport);
+    } else {
+      startAutoplay();
+    }
+  }
+
+  /* Reveal-on-scroll — runs after all dynamic content (e.g. the service
+     grid above) has been inserted, so those elements get observed too. */
+  var revealEls = document.querySelectorAll('[data-reveal]');
+  if (revealEls.length && 'IntersectionObserver' in window) {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(function (el) { revealObserver.observe(el); });
+  } else {
+    revealEls.forEach(function (el) { el.classList.add('is-visible'); });
+  }
+
+  /* Kontakt form: client-side validation + demo submit state.
+     Demo-Modus: kein produktives Versand-Backend angebunden — vor Go-Live
+     an ein echtes Formular-Backend anschliessen. */
+  var form = document.getElementById('kontakt-form');
+  if (form) {
+    var submitBtn = document.getElementById('kontakt-submit');
+    var statusEl = document.getElementById('form-status');
+    var nameInput = document.getElementById('f-name');
+    var emailInput = document.getElementById('f-email');
+
+    function setFieldError(input, errorEl, message) {
+      var field = input.closest('.form-field');
+      if (message) { field.classList.add('has-error'); if (errorEl) errorEl.textContent = message; }
+      else { field.classList.remove('has-error'); if (errorEl) errorEl.textContent = ''; }
+    }
+    function isValidEmail(value) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value); }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var valid = true;
+      var nameError = document.getElementById('f-name-error');
+      var emailError = document.getElementById('f-email-error');
+
+      if (!nameInput.value.trim()) { setFieldError(nameInput, nameError, 'Bitte Namen angeben.'); valid = false; }
+      else { setFieldError(nameInput, nameError, ''); }
+
+      if (!emailInput.value.trim() || !isValidEmail(emailInput.value.trim())) { setFieldError(emailInput, emailError, 'Bitte gültige E-Mail-Adresse angeben.'); valid = false; }
+      else { setFieldError(emailInput, emailError, ''); }
+
+      if (!valid) { statusEl.textContent = 'Bitte die markierten Felder korrigieren.'; statusEl.classList.add('is-error'); return; }
+
+      statusEl.classList.remove('is-error');
+      statusEl.textContent = 'Wird gesendet …';
+      submitBtn.disabled = true;
+      var originalLabel = submitBtn.textContent;
+      submitBtn.textContent = 'Wird gesendet …';
+
+      window.setTimeout(function () {
+        statusEl.textContent = 'Danke — wir melden uns.';
+        submitBtn.textContent = 'Danke — wir melden uns';
+        form.reset();
+        window.setTimeout(function () { submitBtn.disabled = false; submitBtn.textContent = originalLabel; }, 3200);
+      }, 700);
+    });
+  }
+})();

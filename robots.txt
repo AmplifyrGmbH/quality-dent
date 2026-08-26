@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /
+
+Sitemap: https://ihre-neue-website.ch/sitemap.xml
