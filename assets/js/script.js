@@ -78,43 +78,92 @@
   var viewport = document.getElementById('showcaseViewport');
   if (viewport) {
     var dotsWrap = document.getElementById('showcaseDots');
-    var slides = [];
-    services.forEach(function (s, i) {
+    var total = services.length;
+
+    // Center-mode carousel: the viewport's side padding (see CSS
+    // scroll-padding-inline) is sized so the ACTIVE slide sits centered,
+    // leaving equal empty space on the other side to be filled by the
+    // neighbouring slide peeking in. At the very first/last real slide
+    // there is no neighbour to peek — so we clone the last slide before
+    // slide 1 and the first slide after the last slide. The clones fill
+    // that space with a real image preview instead of blank page
+    // background, and once the (smooth) scroll settles on a clone we
+    // silently (no animation) snap to the matching real slide, which
+    // looks identical — the loop is invisible to the user.
+    function buildSlide(s, realIndex, isClone) {
+      var n = String(realIndex + 1).padStart(2, '0');
       var slide = document.createElement('div');
       slide.className = 'showcase__slide';
+      if (isClone) { slide.setAttribute('aria-hidden', 'true'); slide.setAttribute('tabindex', '-1'); }
       slide.innerHTML =
-        '<img src="' + s.img + '" alt="' + s.title + ' – Quality Dent AG" loading="' + (i < 2 ? 'eager' : 'lazy') + '">' +
-        '<div class="showcase__caption"><span class="showcase__no">' + s.n + ' / 08</span>' +
+        '<img src="' + s.img + '" alt="' + (isClone ? '' : s.title + ' – Quality Dent AG') + '" loading="' + (!isClone && realIndex < 2 ? 'eager' : 'lazy') + '">' +
+        '<div class="showcase__caption"><span class="showcase__no">' + n + ' / ' + String(total).padStart(2, '0') + '</span>' +
         '<h3 class="showcase__title">' + s.title + '</h3><p class="showcase__text">' + s.text + '</p></div>';
+      return slide;
+    }
+
+    var slides = [];
+    var realIndexOf = [];
+
+    var cloneLast = buildSlide(services[total - 1], total - 1, true);
+    viewport.appendChild(cloneLast); slides.push(cloneLast); realIndexOf.push(total - 1);
+
+    services.forEach(function (s, i) {
+      var slide = buildSlide(s, i, false);
       viewport.appendChild(slide);
       slides.push(slide);
+      realIndexOf.push(i);
 
       var dot = document.createElement('button');
       dot.type = 'button';
       dot.className = 'showcase__dot';
       dot.setAttribute('aria-label', 'Zu „' + s.title + '“ springen');
-      dot.addEventListener('click', function () { goToSlide(i); userInteracted(); });
+      dot.addEventListener('click', function () { goToSlide(i + 1); userInteracted(); });
       dotsWrap.appendChild(dot);
     });
+
+    var cloneFirst = buildSlide(services[0], 0, true);
+    viewport.appendChild(cloneFirst); slides.push(cloneFirst); realIndexOf.push(0);
+
     var dots = Array.prototype.slice.call(dotsWrap.children);
-    var current = 0;
+    var current = 1;
+    var lastIdx = slides.length - 1;
 
     function setActive(i) {
       current = i;
       slides.forEach(function (s, j) { s.classList.toggle('is-active', j === i); });
-      dots.forEach(function (d, j) { d.classList.toggle('is-active', j === i); });
+      var realIdx = realIndexOf[i];
+      dots.forEach(function (d, j) { d.classList.toggle('is-active', j === realIdx); });
     }
-    function goToSlide(i) {
-      var idx = (i + slides.length) % slides.length;
+    function scrollToSlide(idx, behavior) {
       var slide = slides[idx];
       // Manual centering instead of scrollIntoView: with CSS scroll-snap
       // active on the viewport, a smooth scrollIntoView animation can get
       // cut short by the browser's own snap resolution, landing off-center.
       var target = slide.offsetLeft - (viewport.clientWidth - slide.offsetWidth) / 2;
-      viewport.scrollTo({ left: target, behavior: 'smooth' });
+      viewport.scrollTo({ left: target, behavior: behavior });
+    }
+    function goToSlide(i) {
+      var idx = Math.max(0, Math.min(lastIdx, i));
+      scrollToSlide(idx, 'smooth');
       setActive(idx);
     }
-    setActive(0);
+    // Initial position: land on the first REAL slide (index 1), not on
+    // the clone that the viewport's padding would otherwise center by
+    // default at scrollLeft 0.
+    setActive(1);
+    scrollToSlide(1, 'instant');
+
+    // After the scroll (smooth drag/swipe or the smooth goToSlide above)
+    // comes to rest on a clone, jump instantly to its real counterpart.
+    var settleTimer = null;
+    viewport.addEventListener('scroll', function () {
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(function () {
+        if (current === 0) { scrollToSlide(lastIdx - 1, 'instant'); setActive(lastIdx - 1); }
+        else if (current === lastIdx) { scrollToSlide(1, 'instant'); setActive(1); }
+      }, 140);
+    });
 
     if ('IntersectionObserver' in window) {
       var slideObserver = new IntersectionObserver(function (entries) {
