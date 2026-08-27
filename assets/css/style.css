@@ -254,19 +254,32 @@ button { font-family: inherit; cursor: pointer; }
 }
 @media (prefers-reduced-motion: reduce) { .hero__grain { opacity: .1; } }
 .hero__content {
-  position: relative; z-index: 2; display: flex; flex-direction: column; gap: 20px;
-  max-width: 720px; padding: 100px 24px 52px;
+  position: relative; z-index: 2; display: flex; flex-direction: column; gap: 10px;
+  max-width: 720px; padding: 72px 22px 28px;
 }
+@media (min-width: 620px) { .hero__content { gap: 20px; padding: 100px 24px 52px; } }
 @media (min-width: 1080px) { .hero__content { padding: 120px 40px 68px; gap: 24px; } }
 .hero__content .eyebrow--light { color: #fff; }
-.hero__title { font-size: clamp(30px, 6.4vw, 54px); line-height: 1.03; letter-spacing: -.03em; font-weight: 600; }
+/* Der Hero-Eyebrow ist der einzige lange (Ort + Zusatzinfo statt ein
+   einzelnes Wort wie bei den Section-Eyebrows) — bricht auf schmalen
+   Screens selbst zweizeilig um und kostet Höhe, die dem Foto fehlt.
+   Auf Mobile komplett weggelassen (Titel + Lead reichen dort als
+   Einstieg); ab 620px wieder eingeblendet. */
+.hero__content .eyebrow { display: none; }
+@media (min-width: 620px) { .hero__content .eyebrow { display: inline-flex; font-size: 16px; gap: 14px; letter-spacing: .08em; } }
+.hero__title { font-size: clamp(28px, 6.4vw, 54px); line-height: 1.05; letter-spacing: -.03em; font-weight: 600; }
 .hero__title em { font-style: normal; opacity: .82; }
-.hero__lead { max-width: 500px; font-size: 17px; line-height: 1.6; color: rgba(255,255,255,.86); text-wrap: pretty; }
+.hero__lead { max-width: 500px; font-size: 15.5px; line-height: 1.5; color: rgba(255,255,255,.86); text-wrap: pretty; }
+@media (min-width: 620px) { .hero__lead { font-size: 17px; line-height: 1.6; } }
 @media (min-width: 760px) { .hero__lead { font-size: 18px; } }
 .hero__actions { display: flex; flex-wrap: wrap; gap: 14px; padding-top: 4px; }
 
-.hero-stats { display: flex; gap: 0; border-top: 1px solid rgba(255,255,255,.2); margin-top: 8px; }
-.hero-stats div { flex: 1; padding: 18px 20px 0 0; }
+/* Auf schmalen Screens ausgeblendet: reine Vertrauens-Zusatzinfo (Standorte/
+   Team/Jahre o.ä.) — auf Mobile drängt sie das Hero-Foto zu stark weg, und
+   dieselben Fakten stehen ohnehin meist im "Über uns"-Text weiter unten. */
+.hero-stats { display: none; gap: 0; border-top: 1px solid rgba(255,255,255,.2); margin-top: 4px; }
+.hero-stats div { flex: 1; padding: 16px 20px 0 0; }
+@media (min-width: 620px) { .hero-stats { display: flex; margin-top: 8px; } .hero-stats div { padding: 18px 20px 0 0; } }
 @media (min-width: 1080px) { .hero-stats div { padding: 20px 24px 0 0; } }
 .hero-stats b { display: block; font-size: 1.4rem; font-weight: 600; color: #fff; letter-spacing: -.02em; }
 .hero-stats span { font-size: 12.5px; color: rgba(255,255,255,.66); }
