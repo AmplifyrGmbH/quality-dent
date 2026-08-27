@@ -135,24 +135,40 @@
       var realIdx = realIndexOf[i];
       dots.forEach(function (d, j) { d.classList.toggle('is-active', j === realIdx); });
     }
-    function scrollToSlide(idx, behavior) {
+    function scrollToSlide(idx, instant) {
       var slide = slides[idx];
       // Manual centering instead of scrollIntoView: with CSS scroll-snap
       // active on the viewport, a smooth scrollIntoView animation can get
       // cut short by the browser's own snap resolution, landing off-center.
       var target = slide.offsetLeft - (viewport.clientWidth - slide.offsetWidth) / 2;
-      viewport.scrollTo({ left: target, behavior: behavior });
+      if (instant) {
+        // Direct scrollLeft assignment instead of scrollTo({behavior:'instant'}):
+        // 'instant' is not part of the standardized ScrollToOptions.behavior
+        // (only 'auto'/'smooth' are spec'd) and was observed to silently no-op
+        // on the very first paint in production — the carousel stayed at
+        // scrollLeft 0 (slide 1 left-aligned, clone never visible) instead of
+        // jumping to the centered position. Setting .scrollLeft directly is
+        // unambiguous and always synchronous/instant.
+        viewport.scrollLeft = target;
+      } else {
+        viewport.scrollTo({ left: target, behavior: 'smooth' });
+      }
     }
     function goToSlide(i) {
       var idx = Math.max(0, Math.min(lastIdx, i));
-      scrollToSlide(idx, 'smooth');
+      scrollToSlide(idx, false);
       setActive(idx);
     }
     // Initial position: land on the first REAL slide (index 1), not on
     // the clone that the viewport's padding would otherwise center by
-    // default at scrollLeft 0.
+    // default at scrollLeft 0. Deferred one frame (requestAnimationFrame)
+    // so layout/offsetLeft are guaranteed settled before we measure them —
+    // measuring synchronously during initial script execution was another
+    // contributor to the centering silently failing on first load.
     setActive(1);
-    scrollToSlide(1, 'instant');
+    (window.requestAnimationFrame || window.setTimeout)(function () {
+      scrollToSlide(1, true);
+    });
 
     // After the scroll (smooth drag/swipe or the smooth goToSlide above)
     // comes to rest on a clone, jump instantly to its real counterpart.
@@ -160,8 +176,8 @@
     viewport.addEventListener('scroll', function () {
       clearTimeout(settleTimer);
       settleTimer = setTimeout(function () {
-        if (current === 0) { scrollToSlide(lastIdx - 1, 'instant'); setActive(lastIdx - 1); }
-        else if (current === lastIdx) { scrollToSlide(1, 'instant'); setActive(1); }
+        if (current === 0) { scrollToSlide(lastIdx - 1, true); setActive(lastIdx - 1); }
+        else if (current === lastIdx) { scrollToSlide(1, true); setActive(1); }
       }, 140);
     });
 
