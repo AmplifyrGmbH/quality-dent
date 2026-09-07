@@ -600,3 +600,25 @@ button { font-family: inherit; cursor: pointer; }
 @media (max-width: 480px) {
   .qd-chat-panel { right: 12px; left: 12px; bottom: 88px; width: auto; height: min(70vh, 560px); }
 }
+
+/* ==========================================================================
+   FAQ
+   ========================================================================== */
+.faq-list { display: flex; flex-direction: column; border-top: 1px solid var(--border); max-width: 860px; }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-q {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  padding: 22px 4px; background: none; border: none; text-align: left; cursor: pointer;
+  font-family: inherit; font-size: 16px; font-weight: 600; color: var(--text);
+}
+@media (min-width: 760px) { .faq-q { font-size: 17px; padding: 24px 4px; } }
+.faq-q__icon { position: relative; width: 20px; height: 20px; flex-shrink: 0; }
+.faq-q__icon::before, .faq-q__icon::after { content: ""; position: absolute; background: var(--blue); border-radius: 1px; transition: transform .25s ease, opacity .25s ease; }
+.faq-q__icon::before { top: 9px; left: 1px; width: 18px; height: 2px; }
+.faq-q__icon::after { top: 1px; left: 9px; width: 2px; height: 18px; }
+.faq-q[aria-expanded="true"] .faq-q__icon::after { transform: rotate(90deg); opacity: 0; }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height .3s ease; }
+.faq-q[aria-expanded="true"] + .faq-a { max-height: 400px; }
+.faq-a p { font-size: 14.5px; line-height: 1.65; color: var(--text-secondary); padding: 0 4px 22px; max-width: 68ch; text-wrap: pretty; }
+.faq-a a { color: var(--blue); }
+@media (prefers-reduced-motion: reduce) { .faq-a { transition: none; } }

@@ -217,6 +217,14 @@
     }
   }
 
+  /* FAQ-Akkordeon */
+  document.querySelectorAll('.faq-q').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var isOpen = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+    });
+  });
+
   /* Reveal-on-scroll — runs after all dynamic content (e.g. the service
      grid above) has been inserted, so those elements get observed too. */
   var revealEls = document.querySelectorAll('[data-reveal]');

@@ -23,7 +23,7 @@
 <link rel="preload" as="font" href="assets/fonts/jetbrainsmono-variable.woff2" type="font/woff2" crossorigin>
 <link rel="preload" as="image" href="assets/img/hero-stock-2.jpg" fetchpriority="high">
 
-<link rel="stylesheet" href="assets/css/style.css?v=10">
+<link rel="stylesheet" href="assets/css/style.css?v=11">
 
 <script type="application/ld+json">
 {
@@ -340,6 +340,70 @@
       </form>
     </div>
   </section>
+
+  <!-- ============ FAQ ============
+       Am Seitenende vor der Fusszeile, bewusst OHNE eigenen Nav-Punkt (sonst
+       zu viele Menüpunkte) — erreichbar über den "Häufige Fragen"-Eintrag im
+       Floating-Contact-Widget und als Sprungziel #faq. Antworten aus den
+       echten Inhalten dieser Seite — dieselben Fakten, die auch der
+       Chat-Assistent (assets/js/chat.js) verwendet, damit sichtbare FAQ und
+       Chat-Antworten nie auseinanderlaufen. -->
+  <section class="section section--grey" id="faq">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__title">
+          <span class="eyebrow eyebrow--blue">Häufige Fragen</span>
+          <h2 class="h2">Antworten, bevor Sie fragen müssen.</h2>
+        </div>
+        <p class="lead-text lead-text--right">Die häufigsten Fragen von Praxen und Patientinnen &amp; Patienten — kurz und direkt beantwortet.</p>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item" data-reveal>
+          <button type="button" class="faq-q" aria-expanded="false">
+            <span>Welche Leistungen bietet ihr an?</span>
+            <span class="faq-q__icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-a"><p>Zirkonoxid-Kronen &amp; Brücken, vollkeramische Restaurationen (Inlays, Onlays, Veneers), Metallkeramik, Implantatprothetik, Teil-, Hybrid- und Totalprothesen, Modellguss-Prothesen, Schienen aller Art sowie Valplast.</p></div>
+        </div>
+        <div class="faq-item" data-reveal>
+          <button type="button" class="faq-q" aria-expanded="false">
+            <span>Wie läuft euer digitaler Workflow ab?</span>
+            <span class="faq-q__icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-a"><p>Abformung (digital oder analog) → digitale Planung in Exocad/3Shape → Fräsen &amp; Drucken mit Sirona inLab → Handfinish → Qualitätskontrolle → Lieferung an Ihre Praxis.</p></div>
+        </div>
+        <div class="faq-item" data-reveal>
+          <button type="button" class="faq-q" aria-expanded="false">
+            <span>Wann habt ihr geöffnet?</span>
+            <span class="faq-q__icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-a"><p>Montag – Mittwoch 7:00–12:00 und 13:00–18:00 Uhr, Donnerstag 7:30–12:00 und 13:00–17:30 Uhr, Freitag 8:00–12:00 und 13:00–17:00 Uhr. Samstag und Sonntag geschlossen.</p></div>
+        </div>
+        <div class="faq-item" data-reveal>
+          <button type="button" class="faq-q" aria-expanded="false">
+            <span>Was kostet eine Krone oder Prothese?</span>
+            <span class="faq-q__icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-a"><p>Das hängt stark vom individuellen Fall ab (Material, Umfang, Aufwand) und lässt sich pauschal nicht seriös nennen. Am schnellsten geht es über eine kurze Beratungsanfrage im Terminassistenten oben.</p></div>
+        </div>
+        <div class="faq-item" data-reveal>
+          <button type="button" class="faq-q" aria-expanded="false">
+            <span>Seit wann gibt es Quality Dent?</span>
+            <span class="faq-q__icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-a"><p>2016 als kleines Labor in Opfikon gestartet, im März 2020 als Quality Dent AG in Wallisellen gegründet, seit Januar 2025 mit neuem, voll digitalisiertem Labor in Regensdorf.</p></div>
+        </div>
+        <div class="faq-item" data-reveal>
+          <button type="button" class="faq-q" aria-expanded="false">
+            <span>Arbeitet ihr mit Zahnarztpraxen zusammen?</span>
+            <span class="faq-q__icon" aria-hidden="true"></span>
+          </button>
+          <div class="faq-a"><p>Ja — wir sind ein Dentallabor und arbeiten primär mit Zahnarztpraxen im Grossraum Zürich zusammen, von der Fallabholung bis zur termingerechten Lieferung.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer class="site-footer">
@@ -359,6 +423,7 @@
         <span class="footer-col__title">Kontakt</span>
         <a href="tel:0448104477">044 810 44 77</a>
         <a href="mailto:info@quality-dent.ch">info@quality-dent.ch</a>
+        <a href="#faq">Häufige Fragen</a>
         <a href="#kontakt">Standort &amp; Anfahrt</a>
       </div>
       <div class="footer-col">
@@ -374,7 +439,7 @@
   </div>
 </footer>
 
-<script src="assets/js/script.js?v=10" defer></script>
+<script src="assets/js/script.js?v=11" defer></script>
 <script src="assets/js/booking.js?v=10" defer></script>
 
 <!-- ============ FLOATING CONTACT WIDGET ============ -->
@@ -391,6 +456,11 @@
       <div class="fchat-opt-label"><b>KI-Berater fragen</b><span>Sofort-Antworten rund um Ihren Fall</span></div>
       <svg class="fchat-opt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
     </button>
+    <a class="fchat-opt-row" href="#faq">
+      <span class="fchat-opt-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--fchat-dark)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+      <div class="fchat-opt-label"><b>Häufige Fragen</b><span>Antworten ohne Wartezeit</span></div>
+      <svg class="fchat-opt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
     <a class="fchat-opt-row" href="tel:0448104477">
       <span class="fchat-opt-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--fchat-dark)" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.8 2.1z"/></svg></span>
       <div class="fchat-opt-label"><b>044 810 44 77</b><span>Jetzt anrufen</span></div>
