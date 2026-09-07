@@ -555,12 +555,48 @@ button { font-family: inherit; cursor: pointer; }
 
 @media (max-width: 400px) { .fchat { right: 12px; bottom: 12px; } .fchat-opts { width: calc(100vw - 48px); } }
 
-/* Embed-Chatbot: fullscreen auf Mobile, eigener Trigger-Button ausgeblendet */
-@media (max-width: 767px) {
-  #ac-panel { position: fixed !important; inset: 0 !important; width: 100% !important; max-width: 100% !important; height: 100dvh !important; max-height: 100dvh !important; border-radius: 0 !important; z-index: 99999 !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; }
-  #ac-panel textarea, #ac-panel input[type="text"], #ac-panel input:not([type]) { font-size: 16px !important; }
-  #ac-panel #ac-header, #ac-panel [id*="header"], #ac-panel [class*="header"] { flex-shrink: 0 !important; position: sticky !important; top: 0 !important; z-index: 1 !important; padding-top: env(safe-area-inset-top) !important; }
-  #ac-panel #ac-messages, #ac-panel [id*="message"], #ac-panel [class*="message"] { flex: 1 1 0 !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch !important; overscroll-behavior: contain !important; }
-  #ac-panel #ac-form, #ac-panel form { flex-shrink: 0 !important; padding-bottom: max(8px, env(safe-area-inset-bottom)) !important; border-top: 1px solid rgba(0,0,0,.08) !important; }
+/* ==========================================================================
+   Eigener FAQ-Chat (assets/js/chat.js)
+   ========================================================================== */
+.qd-chat-panel {
+  position: fixed; right: 22px; bottom: 96px; z-index: 9998;
+  width: min(370px, calc(100vw - 44px)); height: min(520px, calc(100vh - 160px));
+  background: #fff; border-radius: 18px; overflow: hidden;
+  box-shadow: 0 32px 72px rgba(0,0,0,.22), 0 8px 24px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.05);
+  display: none; flex-direction: column;
 }
-#ac-btn { visibility: hidden !important; pointer-events: none !important; width: 0 !important; height: 0 !important; min-width: 0 !important; min-height: 0 !important; padding: 0 !important; overflow: hidden !important; }
+.qd-chat-panel.is-open { display: flex; animation: qdChatIn .22s ease; }
+@keyframes qdChatIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .qd-chat-panel.is-open { animation: none; } }
+
+.qd-chat-head { background: linear-gradient(140deg, var(--blue-deep), var(--blue) 140%); color: #fff; padding: 16px 16px 14px; display: flex; align-items: center; gap: 12px; }
+.qd-chat-head__av { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.14); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.qd-chat-head__meta b { display: block; font-size: 14px; }
+.qd-chat-head__meta span { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: rgba(255,255,255,.6); }
+.qd-chat-dot { width: 6px; height: 6px; border-radius: 50%; background: #5fe0a0; display: inline-block; }
+.qd-chat-close { margin-left: auto; background: none; border: 0; color: rgba(255,255,255,.75); cursor: pointer; padding: 4px; line-height: 0; }
+.qd-chat-close:hover { color: #fff; }
+
+.qd-chat-msgs { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: var(--grey-bg); }
+.qd-chat-msg { max-width: 84%; padding: 10px 13px; border-radius: 13px; font-size: 13.5px; line-height: 1.5; }
+.qd-chat-msg--bot { background: #fff; border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 3px; }
+.qd-chat-msg--user { background: var(--blue-deep); color: #fff; align-self: flex-end; border-bottom-right-radius: 3px; }
+.qd-chat-typing { display: flex; gap: 4px; align-items: center; padding: 11px 14px; }
+.qd-chat-typing span { width: 5px; height: 5px; border-radius: 50%; background: var(--text-faint); display: inline-block; animation: qdBlink 1.2s infinite ease-in-out; }
+.qd-chat-typing span:nth-child(2) { animation-delay: .2s; }
+.qd-chat-typing span:nth-child(3) { animation-delay: .4s; }
+@keyframes qdBlink { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+
+.qd-chat-quick { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 12px; background: var(--grey-bg); }
+.qd-chat-quick__btn { font-size: 11.5px; border: 1px solid var(--border); background: #fff; padding: 7px 11px; border-radius: 999px; cursor: pointer; color: var(--text-secondary); }
+.qd-chat-quick__btn:hover { border-color: var(--blue); color: var(--blue); }
+
+.qd-chat-form { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--border); background: #fff; }
+.qd-chat-form input { flex: 1; border: 1px solid var(--border-input); border-radius: 999px; padding: 10px 15px; font-size: 13.5px; font-family: var(--font-sans); background: var(--grey-bg); color: var(--text); }
+.qd-chat-form input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
+.qd-chat-send { width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--blue); color: #fff; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.qd-chat-send:hover { background: var(--blue-hover); }
+
+@media (max-width: 480px) {
+  .qd-chat-panel { right: 12px; left: 12px; bottom: 88px; width: auto; height: min(70vh, 560px); }
+}
