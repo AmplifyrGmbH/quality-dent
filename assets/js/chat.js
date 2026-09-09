@@ -58,12 +58,21 @@
   var GREETING = 'Grüezi! 👋 Ich bin der Quality-Dent-Assistent und kenne mich mit unseren Leistungen, dem digitalen Workflow, Öffnungszeiten und Terminen aus. Was möchten Sie wissen?';
   var FALLBACK = 'Dazu habe ich leider keine passende Antwort parat. Rufen Sie uns gerne direkt an (044 810 44 77) oder schreiben Sie uns an info@quality-dent.ch — oder stellen Sie Ihre Frage etwas anders, vielleicht kann ich dann weiterhelfen.';
 
+  /* Umlaute/ß auf Basisbuchstaben abbilden, BEVOR verglichen wird — sonst
+     verfehlt z.B. eine Autokorrektur/Tastatur-Schreibweise ohne Umlaut
+     ("oeffnungszeit" statt "öffnungszeit") jedes Keyword, das den Umlaut
+     enthält. Siehe SKILL.md "Chatbot antwortet nicht auf naheliegende
+     Fragen". */
+  function stripDiacritics(s) {
+    return s.replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u').replace(/ß/g, 'ss');
+  }
+
   function findAnswer(text) {
-    var low = text.toLowerCase();
+    var low = stripDiacritics(text.toLowerCase());
     for (var i = 0; i < FAQ.length; i++) {
       var kws = FAQ[i].kw;
       for (var j = 0; j < kws.length; j++) {
-        if (low.indexOf(kws[j]) !== -1) return FAQ[i].a;
+        if (low.indexOf(stripDiacritics(kws[j])) !== -1) return FAQ[i].a;
       }
     }
     return FALLBACK;

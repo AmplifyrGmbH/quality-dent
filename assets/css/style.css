@@ -49,7 +49,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-anchor: none; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
 body {
@@ -165,7 +165,7 @@ button { font-family: inherit; cursor: pointer; }
 
 .brand { position: relative; display: flex; align-items: center; gap: 10px; flex-shrink: 0; color: inherit; }
 .brand:hover { color: inherit; }
-.brand__logo { display: block; height: 42px; width: auto; border-radius: 4px; transition: height .3s ease, opacity .4s ease; }
+.brand__logo { display: block; height: 42px; width: auto; border-radius: 4px; transition: opacity .4s ease; }
 .brand__logo--footer { height: 50px; width: auto; border-radius: 4px; }
 @media (min-width: 620px) { .brand__logo { height: 46px; } }
 /* Bigger while the header floats transparently over the hero photo, back
@@ -178,9 +178,9 @@ button { font-family: inherit; cursor: pointer; }
    project's brand__logo--dark/--white pattern. */
 .brand__logo--white {
   position: absolute; top: 0; left: 0; opacity: 0; border-radius: 0;
-  transition: height .3s ease, opacity .4s ease;
+  transition: opacity .4s ease;
 }
-.brand__logo--dark { transition: height .3s ease, opacity .4s ease; }
+.brand__logo--dark { transition: opacity .4s ease; }
 .site-header.is-on-hero .brand__logo--dark { opacity: 0; }
 .site-header.is-on-hero .brand__logo--white { opacity: 1; }
 

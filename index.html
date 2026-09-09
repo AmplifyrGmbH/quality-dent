@@ -52,7 +52,7 @@
 <body>
 <a class="skip-link" href="#main">Zum Inhalt springen</a>
 
-<header class="site-header" id="site-header">
+<header class="site-header is-on-hero" id="site-header">
   <div class="site-header__inner">
     <div class="brand">
       <img class="brand__logo brand__logo--dark" src="assets/img/logo.jpg" alt="Quality Dent AG" width="235" height="100">
@@ -74,6 +74,24 @@
     </div>
   </div>
 </header>
+<!-- Synchrones Inline-Skript, absichtlich NICHT defer/extern: läuft, während
+     der Parser genau hier ankommt — also bevor der Hero-Abschnitt unten
+     überhaupt geparst/gemalt wird. Setzt --header-h auf die ECHTE, gerade
+     gemessene Header-Höhe, statt sich auf den geschätzten CSS-Fallback-Wert
+     (--header-h: 72px in :root) zu verlassen, der je nach Projekt/Logo-Grösse
+     nicht zur tatsächlichen (bereits transparenten, grossen) Header-Höhe
+     passt. Ohne das bliebe ein kurzes Zeitfenster, in dem das Hero-Bild noch
+     mit dem falschen Fallback-Wert positioniert ist, bis das deferred
+     script.js läuft — sichtbar als kurz aufblitzender weisser Balken über
+     dem Header beim (Neu-)Laden. Das deferred script.js misst danach zwar
+     ohnehin nochmal (u.a. für Resize/Scroll), aber bis dahin ist es zu spät
+     für den allerersten Frame. -->
+<script>
+(function () {
+  var h = document.getElementById('site-header');
+  if (h) document.documentElement.style.setProperty('--header-h', h.offsetHeight + 'px');
+})();
+</script>
 
 <main id="main">
 

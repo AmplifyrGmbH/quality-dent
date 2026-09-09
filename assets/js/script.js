@@ -11,15 +11,40 @@
   var syncHeaderHeight = function () {
     if (siteHeader) document.documentElement.style.setProperty('--header-h', siteHeader.offsetHeight + 'px');
   };
-  if (siteHeader && hero && 'IntersectionObserver' in window) {
-    siteHeader.classList.add('is-on-hero');
-    syncHeaderHeight();
-    var heroObserver = new IntersectionObserver(function (entries) {
-      siteHeader.classList.toggle('is-on-hero', entries[0].isIntersecting);
+  if (siteHeader && hero) {
+    var ON_HERO_MAX_SCROLL = 8; // px — small dead zone against rubber-band/jitter at scrollY≈0
+    var headerTicking = false;
+    var applyHeaderScrollState = function () {
+      headerTicking = false;
+      var onHero = window.scrollY <= ON_HERO_MAX_SCROLL;
+      if (siteHeader.classList.contains('is-on-hero') === onHero) return;
+      siteHeader.classList.toggle('is-on-hero', onHero);
       syncHeaderHeight();
       window.setTimeout(syncHeaderHeight, 320); // after the height transition settles
-    }, { rootMargin: '-' + siteHeader.offsetHeight + 'px 0px 0px 0px', threshold: 0 });
-    heroObserver.observe(hero);
+    };
+    siteHeader.classList.add('is-on-hero');
+    syncHeaderHeight();
+    window.setTimeout(syncHeaderHeight, 320); // safety net (see below) — the initial call used to have none
+    applyHeaderScrollState(); // corrects immediately if the page loads already scrolled (e.g. reload mid-page)
+    window.addEventListener('scroll', function () {
+      if (headerTicking) return;
+      headerTicking = true;
+      window.requestAnimationFrame(applyHeaderScrollState);
+    }, { passive: true });
+    /* Real-world bug (found via a live diagnostic overlay, 2026-09): on some
+       browsers/machines the very first syncHeaderHeight() call above can
+       still capture the header's SOLID-state height even though is-on-hero
+       was already added synchronously beforehand — i.e. --header-h ends up
+       stuck at the smaller solid-state value while the header visually
+       renders in the (taller) on-hero state, leaving a gap of page
+       background above the header exactly the size of the difference.
+       Every OTHER state change already got a 320ms delayed re-check (the
+       setTimeout above, originally added for the scroll-triggered path
+       only) — this one, the initial load, did not, so there was never a
+       second chance to correct it. `window.load` (fires once everything —
+       fonts, images, layout — has fully settled) is an unconditional final
+       safety net on top of the 320ms one, regardless of the exact cause. */
+    window.addEventListener('load', syncHeaderHeight);
   } else if (siteHeader && !hero) {
     siteHeader.classList.remove('is-on-hero');
     syncHeaderHeight();
