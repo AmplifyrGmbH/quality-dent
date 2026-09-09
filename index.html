@@ -263,7 +263,7 @@
               <button type="button" class="chip-opt" data-val="Rückfrage zu laufendem Fall">Rückfrage zu laufendem Fall<small>Status, Anpassung</small></button>
               <button type="button" class="chip-opt" data-val="Allgemeine Anfrage">Allgemeine Anfrage<small>Sonstiges</small></button>
             </div>
-            <div class="bk-nav"><span></span><button class="btn btn--primary btn--sm" type="button" onclick="bkNext(1)">Weiter</button></div>
+            <!-- Kein Weiter-Button: Kachel-Klick schaltet selbst weiter (siehe booking.js). -->
           </div>
 
           <div class="bk-panel" id="bkPanel2">
@@ -271,7 +271,8 @@
             <div class="form-field"><input type="date" id="bkDate"></div>
             <div class="bk-note" id="bkHoursNote">Wählen Sie ein Datum, um freie Zeitfenster zu sehen.</div>
             <div class="slot-grid" id="slotGrid"></div>
-            <div class="bk-nav"><button class="btn btn--outline btn--sm" type="button" onclick="bkBack(2)">Zurück</button><button class="btn btn--primary btn--sm" type="button" onclick="bkNext(2)">Weiter</button></div>
+            <!-- Kein Weiter-Button: Zeitfenster-Klick schaltet selbst weiter (siehe booking.js). -->
+            <div class="bk-nav"><button class="btn btn--outline btn--sm" type="button" onclick="bkBack(2)">Zurück</button></div>
           </div>
 
           <div class="bk-panel" id="bkPanel3">

@@ -5,11 +5,14 @@
   var reasonGrid = document.getElementById('reasonGrid');
   if (!reasonGrid) return; // booking widget not on this page
 
+  var reasonAdvanceTimer = null;
   reasonGrid.querySelectorAll('.chip-opt').forEach(function (el) {
     el.addEventListener('click', function () {
       reasonGrid.querySelectorAll('.chip-opt').forEach(function (x) { x.classList.remove('is-sel'); });
       el.classList.add('is-sel');
       bkState.reason = el.getAttribute('data-val');
+      if (reasonAdvanceTimer) clearTimeout(reasonAdvanceTimer);
+      reasonAdvanceTimer = window.setTimeout(function () { window.bkNext(1); }, 260);
     });
   });
 
@@ -17,6 +20,7 @@
   bkDate.setAttribute('min', new Date().toISOString().slice(0, 10));
   var slotGrid = document.getElementById('slotGrid');
   var bkHoursNote = document.getElementById('bkHoursNote');
+  var slotAdvanceTimer = null;
 
   function slotsForDate(dStr) {
     var d = new Date(dStr + 'T00:00:00');
@@ -52,6 +56,8 @@
         slotGrid.querySelectorAll('.slot').forEach(function (x) { x.classList.remove('is-sel'); });
         b.classList.add('is-sel');
         bkState.time = t;
+        if (slotAdvanceTimer) clearTimeout(slotAdvanceTimer);
+        slotAdvanceTimer = window.setTimeout(function () { window.bkNext(2); }, 260);
       });
       slotGrid.appendChild(b);
     });
